@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Simple Business Model — 3D</title>
+<style>
+:root{
+  --surface-2:#ffffff; --surface-1:#f4f4f2; --surface-0:#e8e7e2; --page-bg:#faf9f7;
+  --text-primary:#22221f; --text-secondary:#5c5b56; --text-muted:#8a8984;
+  --text-accent:#b5540a; --text-success:#2f6f4e;
+  --border:#dedcd6; --border-strong:#c3c1ba;
+  --bg-accent:#f6e2cf; --bg-success:#dcecdf;
+  --border-accent:#c97a2e; --border-success:#4f9470;
+  --radius:8px; --pad-md:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --surface-2:#2a2a27; --surface-1:#232320; --surface-0:#1a1a18; --page-bg:#171715;
+    --text-primary:#f0efeb; --text-secondary:#b8b6b0; --text-muted:#84837c;
+    --text-accent:#e08a3f; --text-success:#6fbf94;
+    --border:#3a3a35; --border-strong:#4c4b45;
+    --bg-accent:#3a2c1c; --bg-success:#1e332a;
+    --border-accent:#c97a2e; --border-success:#4f9470;
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--page-bg); color:var(--text-primary);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+.bm-page{max-width:960px;margin:0 auto;padding:2rem 1rem 3rem}
+.bm-wrap{padding:1rem 0}
+h1{font-size:20px;font-weight:500;text-align:center;margin:0 0 4px}
+.bm-sub{font-size:14px;color:var(--text-secondary);text-align:center;margin:0 0 1rem}
+.bm-scenewrap{position:relative;height:440px;perspective:1500px;cursor:grab;touch-action:none;user-select:none}
+.bm-scenewrap.grabbing{cursor:grabbing}
+.bm-scene{position:absolute;left:50%;top:62%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-27deg) rotateY(-32deg)}
+.bm-obj{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
+.bm-face{position:absolute;box-sizing:border-box;border:1px solid var(--border-strong)}
+.bm-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;pointer-events:none}
+.bm-label b{font-size:12px;font-weight:500;line-height:1.25}
+.bm-label span{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.bm-t-primary{color:var(--text-primary)}
+.bm-t-accent{color:var(--text-accent)}
+.bm-t-success{color:var(--text-success)}
+.bm-front{cursor:pointer}
+.bm-dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--text-accent)}
+.bm-dot.back{background:var(--text-success)}
+@media (prefers-reduced-motion: no-preference){
+  .bm-dot{animation:bm-flow 1.7s ease-in-out infinite alternate}
+}
+@keyframes bm-flow{from{transform:translateX(0)}to{transform:translateX(var(--dist))}}
+.bm-caption{font-size:13px;color:var(--text-muted);text-align:center;margin-top:6px}
+.bm-detail{margin-top:12px;padding:var(--pad-md);border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-1);min-height:52px}
+.bm-detail b{font-size:14px;font-weight:500;color:var(--text-primary)}
+.bm-detail p{font-size:13px;color:var(--text-secondary);margin:4px 0 0}
+</style>
+</head>
+<body>
+<div class="bm-page">
+<div class="bm-wrap">
+<h1>A simple business model</h1>
+<p class="bm-sub">Resources become revenue, in 3D</p>
+<div class="bm-scenewrap">
+  <div class="bm-scene"></div>
+</div>
+<p class="bm-caption">Drag to rotate &middot; click a block for details</p>
+<div class="bm-detail"><b>Resources become revenue</b><p>Costs flow in on the left, value gets created in the middle, and revenue flows back out on the right &mdash; then reinvests into resources, closing the loop.</p></div>
+</div>
+</div>
+<script>
+(function(){
+  var root = document.currentScript.closest('.bm-wrap');
+  var inner = root.querySelector('.bm-scene');
+  var sceneWrap = root.querySelector('.bm-scenewrap');
+  var detail = root.querySelector('.bm-detail');
+
+  function mkFace(w,h,tf,bg,border){
+    var f = document.createElement('div');
+    f.className = 'bm-face';
+    f.style.width = w+'px'; f.style.height = h+'px';
+    f.style.margin = (-h/2)+'px 0 0 '+(-w/2)+'px';
+    f.style.transform = tf;
+    f.style.background = 'var('+bg+')';
+    if(border) f.style.borderColor = 'var('+border+')';
+    return f;
+  }
+
+  function mkCuboid(w,h,d,shade){
+    var wrap = document.createElement('div');
+    wrap.className = 'bm-obj';
+    var front = mkFace(w,h,'translateZ('+(d/2)+'px)', shade.front, shade.border);
+    front.classList.add('bm-front');
+    wrap.appendChild(front);
+    wrap.appendChild(mkFace(w,h,'rotateY(180deg) translateZ('+(d/2)+'px)', shade.side, shade.border));
+    wrap.appendChild(mkFace(d,h,'rotateY(90deg) translateZ('+(w/2)+'px)', shade.side, shade.border));
+    wrap.appendChild(mkFace(d,h,'rotateY(-90deg) translateZ('+(w/2)+'px)', shade.side, shade.border));
+    wrap.appendChild(mkFace(w,d,'rotateX(90deg) translateZ('+(h/2)+'px)', shade.top, shade.border));
+    wrap.appendChild(mkFace(w,d,'rotateX(-90deg) translateZ('+(h/2)+'px)', shade.top, shade.border));
+    return {wrap:wrap, front:front};
+  }
+
+  function place(el,x,y,z){ el.style.transform = 'translate3d('+x+'px,'+y+'px,'+z+'px)'; }
+
+  var neutral = {top:'--surface-2', front:'--surface-1', side:'--surface-0', border:'--border-strong'};
+  var accent  = {top:'--bg-accent', front:'--surface-1', side:'--surface-0', border:'--border-accent'};
+  var success = {top:'--bg-success', front:'--surface-1', side:'--surface-0', border:'--border-success'};
+
+  var FW=1000, FH=14, FD=340;
+  var floor = mkCuboid(FW,FH,FD,{top:'--surface-1',front:'--surface-0',side:'--surface-0',border:'--border'});
+  place(floor.wrap, 0, FH/2, 0);
+  inner.appendChild(floor.wrap);
+
+  var blocks = [
+    {x:-400, w:110,d:110,h:140, shade:neutral, label:'Resources & Partners', sub:'Cost structure', tcls:'bm-t-primary',
+      desc:'Suppliers, capital, and key partners that supply the inputs and capabilities the business depends on.'},
+    {x:-200, w:110,d:110,h:165, shade:neutral, label:'Operations', sub:'Key activities', tcls:'bm-t-primary',
+      desc:'The core processes — production, R&D, service delivery — that turn raw resources into something valuable.'},
+    {x:0,    w:120,d:120,h:210, shade:accent,  label:'Product / Service', sub:'Value proposition', tcls:'bm-t-accent',
+      desc:'What the business actually offers: the value proposition that solves a real customer problem or need.'},
+    {x:200,  w:110,d:110,h:165, shade:neutral, label:'Customers', sub:'Target market & channels', tcls:'bm-t-primary',
+      desc:'The segments the business serves, and the channels used to reach, sell to, and support them.'},
+    {x:400,  w:110,d:110,h:190, shade:success, label:'Revenue', sub:'Revenue streams', tcls:'bm-t-success',
+      desc:'The income generated from customers — pricing, subscriptions, transactions — that funds the whole cycle.'}
+  ];
+
+  blocks.forEach(function(b, i){
+    var c = mkCuboid(b.w,b.h,b.d,b.shade);
+    place(c.wrap, b.x, -b.h/2, 0);
+    var lbl = document.createElement('div');
+    lbl.className = 'bm-label';
+    lbl.innerHTML = '<b class="'+b.tcls+'">'+b.label+'</b><span>'+b.sub+'</span>';
+    c.front.appendChild(lbl);
+    c.front.addEventListener('click', function(){
+      detail.innerHTML = '<b>'+b.label+'</b><p>'+b.desc+'</p>';
+    });
+    inner.appendChild(c.wrap);
+  });
+
+  var railShade = {top:'--surface-1',front:'--surface-0',side:'--surface-0',border:'--border'};
+  var FRONT_Z = -80, BACK_Z = 80;
+
+  for(var i=0;i<blocks.length-1;i++){
+    var x1=blocks[i].x, x2=blocks[i+1].x;
+    var gs=x1+70, ge=x2-70, gw=ge-gs, gc=(gs+ge)/2;
+    var seg = mkCuboid(gw,4,30,railShade);
+    place(seg.wrap, gc, -2, FRONT_Z);
+    inner.appendChild(seg.wrap);
+    var dotHolder = document.createElement('div');
+    dotHolder.className='bm-obj';
+    place(dotHolder, gs, -10, FRONT_Z);
+    var dot = document.createElement('div');
+    dot.className='bm-dot';
+    dot.style.setProperty('--dist', gw+'px');
+    dot.style.animationDelay = (i*0.3)+'s';
+    dotHolder.appendChild(dot);
+    inner.appendChild(dotHolder);
+  }
+
+  var back = mkCuboid(940,4,30,railShade);
+  place(back.wrap, 0, -2, BACK_Z);
+  inner.appendChild(back.wrap);
+  var backDotHolder = document.createElement('div');
+  backDotHolder.className='bm-obj';
+  place(backDotHolder, 470, -10, BACK_Z);
+  var backDot = document.createElement('div');
+  backDot.className='bm-dot back';
+  backDot.style.setProperty('--dist','-940px');
+  backDotHolder.appendChild(backDot);
+  inner.appendChild(backDotHolder);
+
+  [-400,400].forEach(function(x){
+    var side = mkCuboid(4,4,160,railShade);
+    place(side.wrap, x, -2, 0);
+    inner.appendChild(side.wrap);
+  });
+
+  var rotX=-27, rotY=-32, dragging=false, lastX=0, lastY=0;
+  var scene = root.querySelector('.bm-scene');
+  var resumeAt=0;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function applyRot(){ scene.style.transform = 'rotateX('+rotX+'deg) rotateY('+rotY+'deg)'; }
+
+  function tick(){
+    if(!dragging && !reduceMotion && Date.now()>resumeAt){
+      rotY += 0.06;
+      applyRot();
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  sceneWrap.addEventListener('mousedown', function(e){
+    dragging = true;
+    lastX = e.clientX; lastY = e.clientY;
+    sceneWrap.classList.add('grabbing');
+  });
+  window.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    var dx = e.clientX-lastX, dy = e.clientY-lastY;
+    rotY += dx*0.4;
+    rotX = Math.max(-60, Math.min(-6, rotX - dy*0.3));
+    lastX = e.clientX; lastY = e.clientY;
+    applyRot();
+  });
+  window.addEventListener('mouseup', function(){
+    if(!dragging) return;
+    dragging = false;
+    sceneWrap.classList.remove('grabbing');
+    resumeAt = Date.now()+2500;
+  });
+})();
+</script>
+</body>
+</html>
