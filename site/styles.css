@@ -69,7 +69,7 @@ a{color:inherit;text-decoration:none}
 }
 .mark:hover .mark__glyph{border-color:rgba(92,225,212,.45);background:rgba(92,225,212,.1)}
 .mark__text{font-size:14px;font-weight:500;letter-spacing:.22em;text-transform:uppercase}
-.topbar__meta{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-faint)}
+.topbar__meta{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim)}
 
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;isolation:isolate}
@@ -136,6 +136,17 @@ a{color:inherit;text-decoration:none}
   .wordmark .w{opacity:0;transform:translateY(.5em);filter:blur(6px);animation:rise .95s var(--ease) forwards;animation-delay:var(--d,0s)}
 }
 @keyframes rise{to{opacity:1;transform:none;filter:blur(0)}}
+
+/* One word lights as the scan line reaches it. Same 9s period as the sweep;
+   script.js offsets the start so the peak lands when the band crosses it. */
+.wordmark .pulse{display:inline-block}
+@media (prefers-reduced-motion: no-preference){
+  .wordmark .pulse{animation:wordPulse 9s ease-in-out infinite}
+}
+@keyframes wordPulse{
+  0%,36%,64%,100%{color:var(--text);text-shadow:0 0 0 rgba(92,225,212,0)}
+  50%{color:#c2f8f0;text-shadow:0 0 34px rgba(92,225,212,.8),0 0 14px rgba(216,252,247,.55)}
+}
 
 .lede{
   margin:1.7rem 0 0;max-width:38ch;

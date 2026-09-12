@@ -10,6 +10,9 @@
   /* Split the headline into words so they can rise in sequence. */
   var head = document.querySelector('[data-split]');
   if (head) {
+    /* The word named by data-pulse gets an inner span of its own: the outer
+       one is already spoken for by the entrance animation. */
+    var pulseWord = (head.getAttribute('data-pulse') || '').toLowerCase();
     var words = head.textContent.split(/(\s+)/);
     head.textContent = '';
     var i = 0;
@@ -17,11 +20,60 @@
       if (!word.trim()) { head.appendChild(document.createTextNode(word)); return; }
       var span = document.createElement('span');
       span.className = 'w';
-      span.textContent = word;
       span.style.setProperty('--d', (0.18 + i * 0.075).toFixed(3) + 's');
+
+      if (pulseWord && word.toLowerCase().replace(/[^a-z0-9]/g, '') === pulseWord) {
+        var inner = document.createElement('span');
+        inner.className = 'pulse';
+        inner.textContent = word;
+        span.appendChild(inner);
+      } else {
+        span.textContent = word;
+      }
+
       head.appendChild(span);
       i++;
     });
+  }
+
+  /* Light the word at the moment the scan band crosses it.
+   *
+   * The band's top runs from -30vh to 105vh across the cycle and it stands
+   * 26vh tall, so its centre sits at (-17 + 135p)vh for progress p. Solving
+   * that for the word's own offset gives the progress to aim at. Both are CSS
+   * animations of the same duration on one document timeline, so aligning
+   * them is just a matter of shifting one start time.
+   */
+  function syncPulseToScan(scanAnim, pulseAnim) {
+    var hero = document.querySelector('.hero');
+    var word = document.querySelector('.wordmark .pulse');
+    if (!hero || !word || scanAnim.startTime === null) return;
+
+    var rect = word.getBoundingClientRect();
+    var offset = rect.top - hero.getBoundingClientRect().top + rect.height / 2;
+    var progress = ((offset / window.innerHeight) * 100 + 17) / 135;
+
+    /* The keyframes peak at the halfway mark. */
+    pulseAnim.startTime = scanAnim.startTime + (progress - 0.5) * 9000;
+  }
+
+  var scanEl = document.querySelector('.hero__scan');
+  var pulseEl = document.querySelector('.wordmark .pulse');
+  if (!reduced && scanEl && pulseEl && scanEl.getAnimations) {
+    var scanAnim = scanEl.getAnimations()[0];
+    var pulseAnim = pulseEl.getAnimations()[0];
+    if (scanAnim && pulseAnim) {
+      Promise.all([scanAnim.ready, pulseAnim.ready])
+        .then(function () {
+          syncPulseToScan(scanAnim, pulseAnim);
+          var t;
+          window.addEventListener('resize', function () {
+            clearTimeout(t);
+            t = setTimeout(function () { syncPulseToScan(scanAnim, pulseAnim); }, 180);
+          });
+        })
+        .catch(function () { /* unsynced but still running */ });
+    }
   }
 
   /* Sections fade up as they enter the viewport. */
