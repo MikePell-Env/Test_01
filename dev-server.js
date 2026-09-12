@@ -1,7 +1,7 @@
 /* Local preview server for the Envisioner site.
  *
- * DEV ONLY — never deployed. Everything in website/ is what ships; this file
- * stays in the repo root. It serves those files and stands in for signup.php,
+ * DEV ONLY — never deployed. Serves the sibling website/ repository, whose
+ * contents are what ship. It stands in for signup.php,
  * which needs PHP and so cannot run here. The stub mirrors the PHP handler's
  * responses so the success and error states are visible locally; it proves
  * nothing about the PHP itself. Signups are printed to this console, not sent.
@@ -11,7 +11,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.join(__dirname, 'website');
+const ROOT = path.join(__dirname, '..', 'website');
 const PORT = 4321;
 
 const TYPES = {
