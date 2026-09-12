@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Envisioner, Inc. — an M. Pell company</title>
+<meta name="description" content="Envisioner, Inc. — an M. Pell company. Something new is taking shape.">
+<meta name="theme-color" content="#05070a">
+<meta property="og:title" content="Envisioner, Inc.">
+<meta property="og:description" content="Something new is taking shape.">
+<meta property="og:image" content="https://envisionerinc.com/assets/hero.png">
+<meta property="og:url" content="https://envisionerinc.com">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="mark" href="/" aria-label="Envisioner, Inc. home">
+    <span class="mark__glyph" aria-hidden="true">E</span>
+    <span class="mark__text">Envisioner</span>
+  </a>
+  <span class="topbar__meta">an M.&nbsp;Pell company</span>
+</header>
+
+<main>
+
+  <section class="hero" id="top">
+    <div class="hero__media" aria-hidden="true">
+      <div class="hero__img" id="heroImg"></div>
+      <div class="hero__duo"></div>
+      <div class="hero__grid"></div>
+      <div class="hero__scan"></div>
+      <div class="hero__vignette"></div>
+    </div>
+
+    <div class="hero__inner">
+      <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>Envisioner,&nbsp;Inc.</p>
+      <h1 class="wordmark" data-split>Something new is taking shape.</h1>
+      <a class="cue" href="#signup">
+        <span>Keep up on the latest</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band__inner">
+      <ol class="triad">
+        <li><span class="triad__n">01</span><h2>Envision</h2><p>The idea before it has a shape.</p></li>
+        <li><span class="triad__n">02</span><h2>Design</h2><p>The shape it needs to be understood.</p></li>
+        <li><span class="triad__n">03</span><h2>Realize</h2><p>The thing itself, out in the world.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="signup" id="signup">
+    <div class="signup__inner">
+      <h2 class="signup__title">Keep up on the latest</h2>
+      <p class="signup__sub">Occasional dispatches. No noise.</p>
+      <form class="form" id="signupForm" action="signup.php" method="post" novalidate>
+        <div class="form__row">
+          <label class="field">
+            <span class="field__label">Name</span>
+            <input type="text" name="name" autocomplete="name" placeholder="Your name">
+          </label>
+          <label class="field">
+            <span class="field__label">Email <i aria-hidden="true">*</i></span>
+            <input type="email" name="email" autocomplete="email" placeholder="you@domain.com" required>
+          </label>
+        </div>
+        <div class="hp" aria-hidden="true">
+          <label>Company <input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <p class="form__error" id="formError" role="alert" hidden></p>
+        <button type="submit" class="btn">
+          <span>Send</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="form__note">Sign up for updates and the occasional preview.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>&copy; <span id="yr">2026</span> Envisioner,&nbsp;Inc. — All rights reserved.</p>
+  <p class="footer__meta">an M.&nbsp;Pell company</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
